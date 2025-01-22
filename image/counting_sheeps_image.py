@@ -55,23 +55,32 @@ class ImageObjectDetection:
                 confidence = box.conf[0]    # Confidence score
 
                 # Draw bounding box
-                color = (0, 255, 0)  # Green color
+                color = (0, 255, 0)  # Green color for bounding box
                 thickness = 2
                 cv.rectangle(frame, (x1, y1), (x2, y2), color, thickness)
 
                 # Display class and confidence
                 label = f"Class: {class_id}, Conf: {confidence:.2f}"
-                cv.putText(frame, label, (x1, y1 - 10),
-                           cv.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+                cv.putText(frame, label, (x1, y1 - 10), cv.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
 
-                # Draw mask (if available)
+                # Draw mask with random color (if available)
                 if masks is not None:
                     mask = masks[i].data.cpu().numpy().astype('uint8')
-                    mask_resized = cv.resize(
-                        mask[0], (frame.shape[1], frame.shape[0]))
-                    frame[mask_resized == 1] = 0.5 * frame[mask_resized ==
-                                                           1] + 0.5 * np.array([0, 255, 0], dtype=np.uint8)
+                    mask_resized = cv.resize(mask[0], (frame.shape[1], frame.shape[0]))
+
+                    # Generate a random color for the mask
+                    mask_color = self.get_random_color()
+
+                    # Apply the mask with the random color
+                    frame[mask_resized == 1] = 0.5 * frame[mask_resized == 1] + 0.5 * np.array(mask_color, dtype=np.uint8)
         return frame
+    
+    def get_random_color(self):
+        # Generate random values for B, G, R channels
+        b = random.randint(30, 255)
+        g = random.randint(30, 255)
+        r = random.randint(30, 255)
+        return (r, g, b)
 
     # def plot_boxes(self, results, frame):
     #     # Get the dimensions of the image
@@ -135,7 +144,7 @@ model_name = "yolov8x-seg.pt"
 image_detector = ImageObjectDetection(model_name)
 
 # Input the image path via the console
-image_path = "./images/2.jpg"
+image_path = "./images/screenshot.jpg"
 
 # Process the image
 image_detector.process_image(image_path)
