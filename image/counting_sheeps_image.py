@@ -46,29 +46,57 @@ class ImageObjectDetection:
         self.thickness = 1    # Font thickness
 
     def plot_boxes(self, results, frame):
-        # Get the dimensions of the image
-        h, w, _ = frame.shape
-
-        # Process detection results
         for r in results:
             boxes = r.boxes.cpu().numpy()
-            for box in boxes:
-                # Get the coordinates of the bounding box
+            masks = r.masks  # Masks for segmentation
+            for i, box in enumerate(boxes):
                 x1, y1, x2, y2 = box.xyxy[0].astype(int)
+                class_id = int(box.cls[0])  # Class ID
+                confidence = box.conf[0]    # Confidence score
 
-                # Draw the bounding box
-                color = (0, 255, 0)  # Green color for the bounding box
-                thickness = 2  # Thickness of the bounding box line
+                # Draw bounding box
+                color = (0, 255, 0)  # Green color
+                thickness = 2
                 cv.rectangle(frame, (x1, y1), (x2, y2), color, thickness)
 
-                # Draw the class label and confidence (optional)
-                class_id = box.cls[0]  # Class ID of the detected object
-                confidence = box.conf[0]  # Confidence score of the detection
-                label = f"Class: {int(class_id)}, Conf: {confidence:.2f}"
+                # Display class and confidence
+                label = f"Class: {class_id}, Conf: {confidence:.2f}"
                 cv.putText(frame, label, (x1, y1 - 10),
                            cv.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
 
+                # Draw mask (if available)
+                if masks is not None:
+                    mask = masks[i].data.cpu().numpy().astype('uint8')
+                    mask_resized = cv.resize(
+                        mask[0], (frame.shape[1], frame.shape[0]))
+                    frame[mask_resized == 1] = 0.5 * frame[mask_resized ==
+                                                           1] + 0.5 * np.array([0, 255, 0], dtype=np.uint8)
         return frame
+
+    # def plot_boxes(self, results, frame):
+    #     # Get the dimensions of the image
+    #     h, w, _ = frame.shape
+
+    #     # Process detection results
+    #     for r in results:
+    #         boxes = r.boxes.cpu().numpy()
+    #         for box in boxes:
+    #             # Get the coordinates of the bounding box
+    #             x1, y1, x2, y2 = box.xyxy[0].astype(int)
+
+    #             # Draw the bounding box
+    #             color = (0, 255, 0)  # Green color for the bounding box
+    #             thickness = 2  # Thickness of the bounding box line
+    #             cv.rectangle(frame, (x1, y1), (x2, y2), color, thickness)
+
+    #             # Draw the class label and confidence (optional)
+    #             class_id = box.cls[0]  # Class ID of the detected object
+    #             confidence = box.conf[0]  # Confidence score of the detection
+    #             label = f"Class: {int(class_id)}, Conf: {confidence:.2f}"
+    #             cv.putText(frame, label, (x1, y1 - 10),
+    #                        cv.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+
+    #     return frame
 
     def process_image(self, image_path):
         # Load the image
@@ -107,7 +135,7 @@ model_name = "yolov8x-seg.pt"
 image_detector = ImageObjectDetection(model_name)
 
 # Input the image path via the console
-image_path = "./images/screenshot.jpg"
+image_path = "./images/2.jpg"
 
 # Process the image
 image_detector.process_image(image_path)
