@@ -9,13 +9,14 @@ import logging
 
 
 class DetectionModel:
-    def __init__(self, model_name):
+    def __init__(self, model_name, model_path):
         # Initialize the device (GPU or CPU) for computations
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         logger.info("Using device: %s", self.device)
 
         # Load the YOLO model
-        self.detection_model = self.load_model(model_name)
+        model_complete_path = model_path + model_name
+        self.detection_model = self.load_model(model_complete_path)
         logger.info("Model loaded: %s", model_name)
 
     def load_model(self, model_name):
@@ -30,9 +31,9 @@ class DetectionModel:
 
 
 class ImageObjectDetection:
-    def __init__(self, model_name):
+    def __init__(self, model_name, model_path):
         # Initialize the detection model
-        self.detection_model = DetectionModel(model_name)
+        self.detection_model = DetectionModel(model_name, model_path)
 
         # Dictionary to store colors associated with object IDs
         self.id_color = {}
@@ -142,8 +143,11 @@ logging.basicConfig(level=logging.DEBUG)
 # YOLO model name
 model_name = "yolov8x-seg.pt"
 
+# YOLO model path
+model_path = "../"
+
 # Create an instance of the class for object detection on images
-image_detector = ImageObjectDetection(model_name)
+image_detector = ImageObjectDetection(model_name, model_path)
 
 # Input the image path via the console
 image_path = "./images/1.jpg"
