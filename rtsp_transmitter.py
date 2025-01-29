@@ -1,6 +1,7 @@
 # stream.py
 import subprocess
 import logging
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -19,6 +20,8 @@ def start_rtsp_stream():
         "-f", "rtsp", 
         rtsp_url
     ]
+    
+    time.sleep(5)
 
     # Run ffmpeg in a separate process to start streaming
     logging.info("Starting the RTSP stream with ffmpeg...")

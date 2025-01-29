@@ -5,7 +5,8 @@ import threading
 from rtsp_transmitter import start_rtsp_stream
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 # RTSP stream URL
 rtsp_url = "rtsp://127.0.0.1:8554/live"
@@ -14,8 +15,11 @@ rtsp_url = "rtsp://127.0.0.1:8554/live"
 video_output_path = r"D:\User\Documents\projects\Lamboo\Counting-Sheep\results\stream_rec.mp4"
 
 # Function to run the RTSP stream in a separate thread
+
+
 def start_stream_in_background():
     start_rtsp_stream()
+
 
 # Create and start a new thread for the RTSP stream
 stream_thread = threading.Thread(target=start_stream_in_background)
@@ -29,7 +33,8 @@ cap = None
 while cap is None or not cap.isOpened():
     cap = cv2.VideoCapture(rtsp_url, cv2.CAP_FFMPEG)
     if not cap.isOpened():
-        logging.warning("Error: Could not connect to RTSP stream. Retrying in 2 seconds...")
+        logging.warning(
+            "Error: Could not connect to RTSP stream. Retrying in 2 seconds...")
         time.sleep(2)
 
 logging.info("Successfully connected to RTSP stream.")
@@ -40,7 +45,8 @@ frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
 # Create a VideoWriter object to save the video
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for .mp4
-out = cv2.VideoWriter(video_output_path, fourcc, 30.0, (frame_width, frame_height))  # 30 FPS
+out = cv2.VideoWriter(video_output_path, fourcc, 30.0,
+                      (frame_width, frame_height))  # 30 FPS
 
 while True:
     ret, frame = cap.read()
@@ -48,11 +54,12 @@ while True:
         logging.error("Error: Could not retrieve frame")
         break
 
-    # Write the frame to the video file
-    out.write(frame)
-
     # Display the frame
-    # cv2.imshow("RTSP Stream", frame)
+    cv2.imshow("RTSP Stream", frame)
+
+    # Add a wait key to allow proper window refresh and handling events
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 # Release resources
 cap.release()
