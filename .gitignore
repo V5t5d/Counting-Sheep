@@ -2,6 +2,7 @@
 
 results/
 videos/
+rtsp-server/
 
 __pycache__
 tags
