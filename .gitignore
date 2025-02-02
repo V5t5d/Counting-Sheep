@@ -1,7 +1,6 @@
 !.gitignore
 
 results/
-videos/
 rtsp-server/
 
 __pycache__

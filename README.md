@@ -24,3 +24,16 @@ Here are some demos showcasing the results obtained from videos sourced from **Y
 https://github.com/khoi03/Counting-Sheeps/assets/80579165/5ddacd24-a270-4521-8807-8d1d61b0edb7
 
 https://github.com/khoi03/Counting-Sheeps/assets/80579165/efc5e2b9-36cb-4d99-a7c6-f08da096e6b5
+
+## RTSP server mode
+
+1. 
+run rtsp server https://github.com/bluenviron/mediamtx/releases
+2. 
+file to stream transformation and sending the stream tothe RTSP server
+ffmpeg -re -i "D:\User\Documents\projects\Lamboo\Counting-Sheep\videos\v4.mp4" -c:v copy -c:a copy -f rtsp rtsp://127.0.0.1:8554/live
+3. 
+receive translation
+ffplay rtsp://127.0.0.1:8554/live
+OR
+python rtsp_receiver.py
